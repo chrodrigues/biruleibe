@@ -3,14 +3,17 @@ data "local_file" "ssh_public_key" {
 }
 
   resource "proxmox_virtual_environment_vm" "k8s-node" {
-  name      = var.proxmox_vm_name
-  node_name = var.proxmox_node_name
+    count      = var.proxmox_number_of_vm
+    name      = format("%s%s",var.proxmox_vm_name,count.index)
+    node_name = var.proxmox_node_name
+
+
 
   initialization {
 
     ip_config {
       ipv4 {
-        address = "192.168.100.50/24"
+        address = format("192.168.100.%d/24", count.index + var.proxmox_vm_ip_address_start)
         gateway = "192.168.100.1"
       }
     }

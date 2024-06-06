@@ -16,9 +16,23 @@ variable "proxmox_user_password" {
 variable "proxmox_node_name" {
   description = "proxmox server name"
   type = string
+  default = "homelab"
 }
 
 variable "proxmox_vm_name" {
   description = "proxmox server name"
   type = string
+  default = "k8s-node-"
+}
+
+variable "proxmox_number_of_vm" {
+  description = "number of k8s nodes"
+  type = string
+  default = "3"
+}
+
+variable "proxmox_vm_ip_address_start" {
+  description = "vm ip address"
+  type = string
+  default = "50"
 }
