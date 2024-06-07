@@ -36,3 +36,9 @@ variable "proxmox_vm_ip_address_start" {
   type = string
   default = "50"
 }
+
+variable "proxmox_datastore_id" {
+  description = "virtual machines datastore"
+  type = string
+  default = "storage-kingston1TB"
+}
