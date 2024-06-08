@@ -1,6 +1,7 @@
 data "local_file" "ssh_public_key" {
   filename = "./id_rsa.pub"
 }
+
   resource "proxmox_virtual_environment_file" "cloud_config" {
     content_type = "snippets"
     datastore_id = var.proxmox_datastore_id
@@ -11,7 +12,7 @@ data "local_file" "ssh_public_key" {
       #cloud-config
       users:
         - default
-        - name: ubuntu
+        - name: crodrigues
           groups:
             - sudo
           shell: /bin/bash
@@ -24,6 +25,7 @@ data "local_file" "ssh_public_key" {
           - timedatectl set-timezone America/Toronto
           - systemctl enable qemu-guest-agent
           - systemctl start qemu-guest-agent
+          - modprobe br_netfilter
           - echo "done" > /tmp/cloud-config.done
       EOF
 
