@@ -1,8 +1,4 @@
-data "local_file" "ssh_public_key" {
-  filename = "./id_rsa.pub"
-}
-
-  resource "proxmox_virtual_environment_file" "cloud_config" {
+resource "proxmox_virtual_environment_file" "cloud_config" {
     content_type = "snippets"
     datastore_id = var.proxmox_datastore_id
     node_name    = var.proxmox_node_name
@@ -26,6 +22,9 @@ data "local_file" "ssh_public_key" {
           - systemctl enable qemu-guest-agent
           - systemctl start qemu-guest-agent
           - modprobe br_netfilter
+          - wget https://raw.githubusercontent.com/chrodrigues/biruleibe/main/terraform/proxmox/kubeadm_init.sh
+          - chmod +x /kubeadm_init.sh
+          - /bin/bash /kubeadm_init.sh
           - echo "done" > /tmp/cloud-config.done
       EOF
 
@@ -33,7 +32,7 @@ data "local_file" "ssh_public_key" {
     }
   }
 
-  resource "proxmox_virtual_environment_vm" "k8s-node" {
+resource "proxmox_virtual_environment_vm" "k8s-node" {
     count      = var.proxmox_number_of_vm
     name      = format("%s%s",var.proxmox_vm_name,count.index)
     node_name = var.proxmox_node_name
@@ -76,6 +75,11 @@ resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
   content_type = "iso"
   datastore_id = var.proxmox_datastore_id
   node_name    = var.proxmox_node_name
+  upload_timeout  = 1800
 
-  url = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+  url = "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
+}
+
+data "local_file" "ssh_public_key" {
+  filename = "./id_rsa.pub"
 }
