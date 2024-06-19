@@ -3,14 +3,14 @@
 
 get_hostname(){
   #login values
-  PROXMOX_USERNAME=$PROX_USERNAME
-  PROXMOX_PASSWORD=$PROX_PASSWORD
+  PROXMOX_USERNAME=$PROXMOX_USERNAME
+  PROXMOX_PASSWORD=$PROXMOX_PASSWORD
   PROXMOX_HOST=$PROXMOX_HOST
   #get all mac adresses
   MAC_ADDRESS=($(cat /sys/class/net/*/address))
 
   #get ticket
-  DATA=`curl -s4 -k -d "username=$PROX_USERNAME&password=$PROX_PASSWORD" $HOST/api2/json/access/ticket`
+  DATA=`curl -s4 -k -d "username=$PROXMOX_USERNAME&password=$PROXMOX_PASSWORD" $PROXMOX_HOST/api2/json/access/ticket`
   TICKET=$(echo "${DATA}" | jq -r .data.ticket )
   CSRF=$(echo "${DATA}" | jq -r .data.CSRFPreventionToken)
 
