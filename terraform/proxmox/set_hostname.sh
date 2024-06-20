@@ -1,6 +1,8 @@
 #!/bin/bash
 #/var/lib/cloud/scripts/per-once
 
+source /tmp/credential.env
+
 get_hostname(){
   #login values
   PROXMOX_USERNAME=$PROXMOX_USERNAME
@@ -15,14 +17,14 @@ get_hostname(){
   CSRF=$(echo "${DATA}" | jq -r .data.CSRFPreventionToken)
 
   #get all vms
-  DATA=$(curl -s4k -b "PVEAuthCookie=$TICKET" $HOST/api2/json/cluster/resources | jq -S -r '(.data[] |select(.type=="qemu")) ')
+  DATA=$(curl -s4k -b "PVEAuthCookie=$TICKET" $PROXMOX_HOST/api2/json/cluster/resources | jq -S -r '(.data[] |select(.type=="qemu")) ')
   NODE=($(echo "${DATA}" | jq -r .node))
   VMID=($(echo "${DATA}" | jq -r .vmid))
   NAME=($(echo "${DATA}" | jq -r .name | sed s/'VM.[0-9]*'/unnamed/g))
   echo "own mac"$MAC_ADDRESS
   #get interface mac address
   for ((i = 0 ; i < ${#VMID[@]} ; i++)); do
-    DATA=$(curl -s4k -b "PVEAuthCookie=$TICKET" $HOST/api2/json/nodes/${NODE[$i]}/qemu/${VMID[$i]}/config)
+    DATA=$(curl -s4k -b "PVEAuthCookie=$TICKET" $PROXMOX_HOST/api2/json/nodes/${NODE[$i]}/qemu/${VMID[$i]}/config)
     MAC=$(echo "${DATA}" | jq .data.net0 | cut -d "=" -f2 | cut -d "," -f1)
     #compare mac adress
     if [[ "${MAC_ADDRESS[@]}" =~ "${MAC,,}" ]]; then
