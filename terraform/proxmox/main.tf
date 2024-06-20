@@ -16,15 +16,18 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
             - ${trimspace(data.local_file.ssh_public_key.content)}
           sudo: ALL=(ALL) NOPASSWD:ALL
       runcmd:
+          -  echo "PROXMOX_USERNAME=${var.proxmox_user_name}" > /tmp/credential.env
+          -  echo "PROXMOX_PASSWORD=${var.proxmox_user_password}" >> /tmp/credential.env
+          -  echo "PROXMOX_HOST=${var.proxmox_endpoint}" >> /tmp/credential.env
           - apt update
-          - apt install -y qemu-guest-agent net-tools
+          - apt install -y qemu-guest-agent net-tools jq
           - timedatectl set-timezone America/Toronto
           - systemctl enable qemu-guest-agent
           - systemctl start qemu-guest-agent
           - modprobe br_netfilter
-          - wget https://raw.githubusercontent.com/chrodrigues/biruleibe/main/terraform/proxmox/kubeadm_init.sh
-          - chmod +x /kubeadm_init.sh
-          - /bin/bash /kubeadm_init.sh
+          - wget https://raw.githubusercontent.com/chrodrigues/biruleibe/main/terraform/proxmox/kubeadm_init.sh https://raw.githubusercontent.com/chrodrigues/biruleibe/main/terraform/proxmox/set_hostname.sh
+          - chmod +x /kubeadm_init.sh /set_hostname.sh
+          - /bin/bash /kubeadm_init.sh /set_hostname.sh
           - echo "done" > /tmp/cloud-config.done
       EOF
 
@@ -40,6 +43,16 @@ resource "proxmox_virtual_environment_vm" "k8s-node" {
     agent {
       enabled = true
     }
+
+#provisioner "remote-exec" {
+#  command = <<EOF
+#    export PROXMOX_USERNAME=${var.proxmox_user_name}
+#    export PROXMOX_PASSWORD=${var.proxmox_user_password}
+#    export PROXMOX_HOST=${var.proxmox_endpoint}
+#    wget -q -O /var/lib/cloud/scripts/per-once https://raw.githubusercontent.com/chrodrigues/biruleibe/main/terraform/proxmox/set_hostname.sh
+#    chmod +x /var/lib/cloud/scripts/per-once/set_hostname.sh
+#  EOF
+#}
 
   initialization {
     user_data_file_id = proxmox_virtual_environment_file.cloud_config.id
@@ -75,7 +88,7 @@ resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
   content_type = "iso"
   datastore_id = var.proxmox_datastore_id
   node_name    = var.proxmox_node_name
-  upload_timeout  = 1800
+  upload_timeout  = 2500
 
   url = "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
 }
