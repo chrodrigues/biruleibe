@@ -18,6 +18,12 @@ EOF
 
 sudo sysctl --system
 
+### Install and configure docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+chmod +x get-docker.sh
+sudo ./get-docker.sh
+sudo usermod -aG docker crodrigues
+
 ### Installing kubeadm, kubelet and kubectl
 # -> these instructions are for Kubernetes v1.29 <-
 # Update the apt package index and install packages needed to use the Kubernetes apt repository:
