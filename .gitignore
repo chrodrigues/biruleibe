@@ -35,3 +35,6 @@ terraform.rc
 
 # Ignore ide files
 *.idea/*
+
+# Ignore private ssh key
+id_rsa
