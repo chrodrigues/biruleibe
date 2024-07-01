@@ -8,15 +8,10 @@ cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
 br_netfilter
 EOF
 
-cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1
-EOF
+#### Disable ipv6
+sudo sed -i 's/^GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="ipv6.disable=1"/' /etc/default/grub
+sudo update-grub
 
-sudo sysctl --system
 
 ### Install and configure docker
 curl -fsSL https://get.docker.com -o get-docker.sh
