@@ -34,3 +34,6 @@ sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 # Enable the kubelet service before running kubeadm:
 sudo systemctl enable --now kubelet
+# fix [ERROR CRI]: container runtime is not running
+sudo rm /etc/containerd/config.toml
+sudo systemctl restart containerd
