@@ -8,7 +8,7 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
       #cloud-config
       users:
         - default
-        - name: crodrigues
+        - name: ${var.proxmox_vm_user}
           groups:
             - sudo
           shell: /bin/bash
@@ -36,38 +36,24 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
     }
   }
 
-resource "proxmox_virtual_environment_vm" "k8s-node" {
-    count      = var.proxmox_number_of_vm
-    name      = format("%s%s",var.proxmox_vm_name,count.index)
+resource "proxmox_virtual_environment_vm" "k8s-control-plane" {
+    count      = var.proxmox_number_of_vm_k8s_control_plane
+    name      = format("%s%s",var.proxmox_vm_name_k8s_control_plane,count.index)
     node_name = var.proxmox_node_name
+    stop_on_destroy = true
 
     agent {
       enabled = true
     }
-
-#provisioner "remote-exec" {
-#  command = <<EOF
-#    export PROXMOX_USERNAME=${var.proxmox_user_name}
-#    export PROXMOX_PASSWORD=${var.proxmox_user_password}
-#    export PROXMOX_HOST=${var.proxmox_endpoint}
-#    wget -q -O /var/lib/cloud/scripts/per-once https://raw.githubusercontent.com/chrodrigues/biruleibe/main/terraform/proxmox/set_hostname.sh
-#    chmod +x /var/lib/cloud/scripts/per-once/set_hostname.sh
-#  EOF
-#}
 
   initialization {
     user_data_file_id = proxmox_virtual_environment_file.cloud_config.id
 
     ip_config {
       ipv4 {
-        address = format("192.168.100.%d/24", count.index + var.proxmox_vm_ip_address_start)
+        address = format("192.168.100.%d/24", count.index + var.k8s_control_plane_ip_start)
         gateway = "192.168.100.1"
       }
-    }
-
-    user_account {
-      username = "crodrigues"
-      keys     = [trimspace(data.local_file.ssh_public_key.content)]
     }
   }
 
@@ -80,9 +66,69 @@ resource "proxmox_virtual_environment_vm" "k8s-node" {
     size         = 40
   }
 
+  cpu {
+    architecture = "x86_64"
+    cores = 2
+  }
+
+  memory {
+    dedicated = 4096
+  }
+
   network_device {
     bridge = "vmbr0"
   }
+
+}
+
+resource "proxmox_virtual_environment_vm" "k8s-worker-node" {
+  count      = var.proxmox_number_of_vm_k8s_worker_node
+  name      = format("%s%s",var.proxmox_vm_name_k8s_worker_node,count.index)
+  node_name = var.proxmox_node_name
+  stop_on_destroy = true
+
+  agent {
+    enabled = true
+  }
+
+  initialization {
+    user_data_file_id = proxmox_virtual_environment_file.cloud_config.id
+
+    ip_config {
+      ipv4 {
+        address = format("192.168.100.%d/24", count.index + var.k8s_worker_ip_start)
+        gateway = "192.168.100.1"
+      }
+    }
+
+    #  user_account {
+    #    username = "crodrigues"
+    #    keys     = [trimspace(data.local_file.ssh_public_key.content)]
+    #  }
+  }
+
+  disk {
+    datastore_id = var.proxmox_datastore_id
+    file_id      = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
+    interface    = "virtio0"
+    iothread     = true
+    discard      = "on"
+    size         = 100
+  }
+
+  cpu {
+    architecture = "x86_64"
+    cores = 4
+  }
+
+  memory {
+    dedicated = 6144
+  }
+
+  network_device {
+    bridge = "vmbr0"
+  }
+
 }
 
 resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
