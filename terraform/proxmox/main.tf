@@ -129,6 +129,7 @@ resource "proxmox_virtual_environment_vm" "k8s-worker-node" {
     bridge = "vmbr0"
   }
 
+  depends_on = [proxmox_virtual_environment_vm.k8s-control-plane]
 }
 
 resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
