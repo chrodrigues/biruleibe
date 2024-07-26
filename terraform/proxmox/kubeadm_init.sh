@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 #### Installing and Configuring containerd as a Kubernetes Container Runtime (https://www.nocentino.com/posts/2021-12-27-installing-and-configuring-containerd-as-a-kubernetes-container-runtime/#configure-required-modules)
 # Configure required modules
@@ -21,9 +21,15 @@ EOF
 # Apply sysctl parameters without rebooting to the current running environment
 sudo sysctl --system
 
-# Install containerd packages
+### Install and configure docker
 sudo apt-get update
-sudo apt-get install -y containerd.io
+curl -fsSL https://get.docker.com -o get-docker.sh
+chmod +x get-docker.sh
+sudo ./get-docker.sh
+sudo usermod -aG docker crodrigues
+
+# Install containerd packages
+#sudo apt-get install -y containerd.io # not required since is being installed one step before
 # Make containerd config.toml file default
 sudo containerd config default | sudo tee /etc/containerd/config.toml
 
@@ -37,12 +43,6 @@ sudo systemctl restart containerd
 sudo sed -i 's/^GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="ipv6.disable=1"/' /etc/default/grub
 sudo update-grub
 
-### Install and configure docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-chmod +x get-docker.sh
-sudo ./get-docker.sh
-sudo usermod -aG docker crodrigues
-
 ### Installing kubeadm, kubelet and kubectl
 # -> these instructions are for Kubernetes v1.29 <-
 # Update the apt package index and install packages needed to use the Kubernetes apt repository:
@@ -51,6 +51,7 @@ sudo apt-get install -y apt-transport-https ca-certificates curl gpg
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 # Add the appropriate Kubernetes apt repository.
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
 # Update the apt package index, install kubelet, kubeadm and kubectl, and pin their version:
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl

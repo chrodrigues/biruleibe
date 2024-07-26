@@ -24,7 +24,6 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
           - timedatectl set-timezone America/Toronto
           - systemctl enable qemu-guest-agent
           - systemctl start qemu-guest-agent
-          - modprobe br_netfilter
           - wget https://raw.githubusercontent.com/chrodrigues/biruleibe/main/terraform/proxmox/kubeadm_init.sh https://raw.githubusercontent.com/chrodrigues/biruleibe/main/terraform/proxmox/set_hostname.sh
           - chmod +x /kubeadm_init.sh /set_hostname.sh
           - /bin/bash /kubeadm_init.sh
