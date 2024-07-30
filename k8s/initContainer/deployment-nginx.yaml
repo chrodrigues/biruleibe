@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      volumes:
+        - name: nginx-repo
+          emptyDir: {}
+      initContainers:
+        - name: git-clone
+          image: alpine/git
+          command: [ 'sh', '-c', 'git clone https://raw.githubusercontent.com/chrodrigues/biruleibe/main/k8s/configs /mnt/repo' ]
+          volumeMounts:
+            - name: nginx-repo
+              mountPath: /mnt/repo
+      containers:
+        - image: nginx
+          name: nginx
+          resources: {}
+          volumeMounts:
+            - name: nginx-repo
+              mountPath: /usr/share/nginx/html
