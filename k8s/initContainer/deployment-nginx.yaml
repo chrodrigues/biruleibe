@@ -20,7 +20,7 @@ spec:
       initContainers:
         - name: git-clone
           image: alpine/git
-          command: [ 'sh', '-c', 'git clone https://raw.githubusercontent.com/chrodrigues/biruleibe/main/k8s/configs /mnt/repo' ]
+          command: [ 'sh', '-c', 'git clone https://github.com/chrodrigues/nginx-html.git /mnt/repo' ]
           volumeMounts:
             - name: nginx-repo
               mountPath: /mnt/repo
