@@ -6,6 +6,20 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
     source_raw {
       data = <<-EOF
       #cloud-config
+      disk_setup:
+         ephmeral0:
+             table_type: 'mbr'
+             layout: 'auto'
+         /dev/vdb:
+             table_type: 'mbr'
+             layout: true
+             overwrite: false
+      fs_setup:
+         - label: ephemeral0
+           filesystem: 'ext4'
+           device: '/dev/vdb1'
+      mounts:
+       - [ vdb, /mnt/data, "ext4", "defaults,nofail", "0", "0" ]
       users:
         - default
         - name: ${var.proxmox_vm_user}
@@ -110,6 +124,14 @@ resource "proxmox_virtual_environment_vm" "k8s-worker-node" {
     datastore_id = var.proxmox_datastore_id
     file_id      = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
     interface    = "virtio0"
+    iothread     = true
+    discard      = "on"
+    size         = 30
+  }
+
+  disk {
+    datastore_id = var.proxmox_datastore_id
+    interface    = "virtio1"
     iothread     = true
     discard      = "on"
     size         = 100
