@@ -19,7 +19,7 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
            filesystem: 'ext4'
            device: '/dev/vdb1'
       mounts:
-       - [ vdb, /mnt/data, "ext4", "defaults,nofail", "0", "0" ]
+       - [ vdb, /var/openebs/local, "ext4", "defaults,nofail", "0", "0" ]
       users:
         - default
         - name: ${var.proxmox_vm_user}
