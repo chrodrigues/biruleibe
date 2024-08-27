@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kubelet
+  namespace: default
+  labels:
+    app: prometheus
+spec:
+  endpoints:
+  - interval: 30s
+    port: "http-metrics"
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      k8s-app: kubelet
+      app.kubernetes.io/name: kubelet

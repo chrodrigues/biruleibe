@@ -17,6 +17,8 @@ spec:
   serviceAccountName: prometheus
   version: v2.22.1
   serviceMonitorSelector: {}
+  podMonitorSelector: {}
+  serviceMonitorNamespaceSelector: {}
   remoteWrite:
       - url: https://prometheus-prod-40-prod-sa-east-1.grafana.net/api/prom/push
         basicAuth:
@@ -26,6 +28,6 @@ spec:
           password:
             name: kubepromsecret
             key: password
-  replicaExternalLabelName: "prometheus-onprem-cluster-replica"
+  replicaExternalLabelName: ""
   externalLabels:
     cluster: "prometheus-onprem-cluster"
