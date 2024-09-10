@@ -28,6 +28,12 @@ spec:
         - image: nginx
           name: nginx
           resources: {}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 3
           volumeMounts:
             - name: nginx-repo
               mountPath: /usr/share/nginx/html
