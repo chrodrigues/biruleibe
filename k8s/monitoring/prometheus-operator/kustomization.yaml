@@ -1,0 +1,11 @@
+resources:
+  - https://github.com/kubernetes/kube-state-metrics/examples/standard
+  - grafana_cloud_secret.yaml
+  - kubelet_servicemonitor.yaml
+  - nodeexporter_servicemonitor.yaml
+  - prometheus.yaml
+  - prometheus_nodeexporter.yaml
+  - prometheus_nodeexporter_service.yaml
+  - prometheus_rbac.yaml
+  - prometheus_service.yaml
+  - prometheus_servicemonitor.yaml

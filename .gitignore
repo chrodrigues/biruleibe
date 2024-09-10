@@ -41,4 +41,4 @@ terraform.rc
 id_rsa
 
 ## TODO: to setup terraform vault
-/k8s/monitoring/grafana-cloud/grafana_cloud_secret.yaml
+/k8s/monitoring/prometheus-operator/grafana_cloud_secret.yaml
