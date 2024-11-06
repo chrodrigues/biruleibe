@@ -1,0 +1,56 @@
+- name: Download Zabbix release package
+  ansible.builtin.get_url:
+    url: https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-2+ubuntu22.04_all.deb
+    dest: /tmp/zabbix-release_7.0-2+ubuntu22.04_all.deb
+  become: yes
+
+- name: Install Zabbix release package using dpkg
+  ansible.builtin.command:
+    cmd: dpkg -i /tmp/zabbix-release_7.0-2+ubuntu22.04_all.deb
+
+- name: Update repositories cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Ensure Zabbix agent is installed
+  ansible.builtin.apt:
+    name: zabbix-agent
+    state: present
+
+- name: Verify if Zabbix agent service file exists
+  ansible.builtin.stat:
+    path: /lib/systemd/system/zabbix-agent.service
+  register: zabbix_service_file
+
+- name: Copy custom Zabbix agent configuration
+  ansible.builtin.copy:
+    src: zabbix_agentd.conf
+    dest: /etc/zabbix/zabbix_agentd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart zabbix-agent
+
+- name: Modify Zabbix agent service file to run as root
+  ansible.builtin.lineinfile:
+    path: /lib/systemd/system/zabbix-agent.service
+    regexp: '^User=zabbix'
+    line: 'User=root'
+    backrefs: yes
+
+- name: Modify Zabbix agent service file group to root
+  ansible.builtin.lineinfile:
+    path: /lib/systemd/system/zabbix-agent.service
+    regexp: '^Group=zabbix'
+    line: 'Group=root'
+    backrefs: yes
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Ensure Zabbix agent service is enabled and running
+  ansible.builtin.systemd:
+    name: zabbix-agent
+    enabled: yes
+    state: started

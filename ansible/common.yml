@@ -1,0 +1,7 @@
+- name: Linux Operating System Config
+  hosts: all
+  become: true
+  gather_facts: False
+  strategy: free
+  roles:
+    - zabbix-agent

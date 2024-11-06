@@ -1,0 +1,2 @@
+#- import_tasks: remove_zabbixagent.yml
+- import_tasks: configure_zabbixagent.yml

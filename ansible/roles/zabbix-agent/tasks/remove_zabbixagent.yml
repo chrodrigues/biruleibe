@@ -1,0 +1,35 @@
+# remove_zabbixagent.yml
+- name: Stop and disable Zabbix agent service
+  ansible.builtin.systemd:
+    name: zabbix-agent
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+
+- name: Remove Zabbix agent package
+  ansible.builtin.apt:
+    name: zabbix-agent
+    state: absent
+  ignore_errors: yes
+
+- name: Remove Zabbix release package
+  ansible.builtin.apt:
+    name: zabbix-release
+    state: absent
+  ignore_errors: yes
+
+- name: Remove Zabbix agent configuration directory
+  ansible.builtin.file:
+    path: /etc/zabbix
+    state: absent
+  ignore_errors: yes
+
+- name: Remove Zabbix agent service file if it exists
+  ansible.builtin.file:
+    path: /lib/systemd/system/zabbix-agent.service
+    state: absent
+  ignore_errors: yes
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: yes
