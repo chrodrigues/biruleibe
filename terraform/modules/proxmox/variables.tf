@@ -67,8 +67,14 @@ variable "k8s_worker_ip_start" {
   default = "60"
 }
 
+variable "proxmox_datastore_locallvm" {
+  description = "virtual machines datastore"
+  type = string
+  default = "local-lvm"
+}
+
 variable "proxmox_datastore_id" {
   description = "virtual machines datastore"
   type = string
-  default = "storage-kingston1TB"
+  default = "storage"
 }
