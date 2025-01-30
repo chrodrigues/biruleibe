@@ -165,3 +165,6 @@ resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
 data "local_file" "ssh_public_key" {
   filename = "./id_rsa.pub"
 }
+
+#TODO: Prepare one node to be the "IA node"
+#TODO: https://hub.docker.com/r/ollama/ollama
