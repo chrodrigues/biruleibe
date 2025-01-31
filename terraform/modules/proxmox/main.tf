@@ -82,6 +82,7 @@ resource "proxmox_virtual_environment_vm" "k8s-control-plane" {
   cpu {
     architecture = "x86_64"
     cores = 2
+    type = "host"
   }
 
   memory {
@@ -140,6 +141,7 @@ resource "proxmox_virtual_environment_vm" "k8s-worker-node" {
   cpu {
     architecture = "x86_64"
     cores = 4
+    type = "host"
   }
 
   memory {
