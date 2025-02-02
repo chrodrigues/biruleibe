@@ -1,6 +1,6 @@
 resource "proxmox_virtual_environment_file" "cloud_config" {
     content_type = "snippets"
-    datastore_id = var.proxmox_datastore_id
+    datastore_id = var.proxmox_datastore_name
     node_name    = var.proxmox_node_name
 
     source_raw {
@@ -71,7 +71,7 @@ resource "proxmox_virtual_environment_vm" "k8s-control-plane" {
   }
 
   disk {
-    datastore_id = var.proxmox_datastore_id
+    datastore_id = var.proxmox_datastore_name
     file_id      = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
     interface    = "virtio0"
     iothread     = true
@@ -92,6 +92,8 @@ resource "proxmox_virtual_environment_vm" "k8s-control-plane" {
   network_device {
     bridge = "vmbr0"
   }
+
+  depends_on = [proxmox_virtual_environment_file.cloud_config]
 
 }
 
@@ -122,7 +124,7 @@ resource "proxmox_virtual_environment_vm" "k8s-worker-node" {
   }
 
   disk {
-    datastore_id = var.proxmox_datastore_id
+    datastore_id = var.proxmox_datastore_name
     file_id      = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
     interface    = "virtio0"
     iothread     = true
@@ -131,7 +133,7 @@ resource "proxmox_virtual_environment_vm" "k8s-worker-node" {
   }
 
   disk {
-    datastore_id = var.proxmox_datastore_id
+    datastore_id = var.proxmox_datastore_name
     interface    = "virtio1"
     iothread     = true
     discard      = "on"
@@ -157,7 +159,7 @@ resource "proxmox_virtual_environment_vm" "k8s-worker-node" {
 
 resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
   content_type = "iso"
-  datastore_id = var.proxmox_datastore_id
+  datastore_id = var.proxmox_datastore_name
   node_name    = var.proxmox_node_name
   upload_timeout  = 2500
 
