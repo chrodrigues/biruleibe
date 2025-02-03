@@ -1,0 +1,8 @@
+resources:
+  - ../../base/
+
+namespace: deepseek
+namePrefix: homelab-
+replicas:
+  - count: 1
+    name: deepseek
