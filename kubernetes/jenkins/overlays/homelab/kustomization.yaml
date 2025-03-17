@@ -1,0 +1,14 @@
+resources:
+  - ../../base/
+
+namespace: homelab-jenkins
+
+replicas:
+  - count: 1
+    name: jenkins
+
+images:
+  - name: jenkins/jenkins
+    newTag: jdk21
+
+
