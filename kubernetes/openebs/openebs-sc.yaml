@@ -10,5 +10,6 @@ metadata:
         value: "/var/openebs/local"
     openebs.io/cas-type: local
 provisioner: openebs.io/local
-reclaimPolicy: Delete
+reclaimPolicy: Retain
 volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true

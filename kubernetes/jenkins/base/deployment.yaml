@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  labels:
+    app: jenkins
+spec:
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      #nodeSelector:
+      #  name: k8s-worker-0
+      initContainers:
+        - name: initcontainer
+          imagePullPolicy: Always
+          image: busybox
+          command:
+            - /bin/sh
+            - -c
+            - chown 1000:1000 /var/jenkins_home/
+          volumeMounts:
+            - mountPath: /var/jenkins_home
+              name: jenkins-data
+      containers:
+        - name: jenkins
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+          image: jenkins/jenkins:lts
+          #command:
+          #  - /bin/sh
+          #  - -c
+          #  - sleep 100000000
+          resources:
+            requests:
+              memory: 100Mi
+              cpu: 100m
+          volumeMounts:
+            - mountPath: /var/jenkins_home
+              name: jenkins-data
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: agents
+              containerPort: 50000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: "/login"
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: "/login"
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+      volumes:
+        - name: jenkins-data
+          persistentVolumeClaim:
+            claimName: jenkins-pvc
