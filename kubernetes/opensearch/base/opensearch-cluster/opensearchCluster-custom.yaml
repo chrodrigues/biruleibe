@@ -1,0 +1,149 @@
+apiVersion: opensearch.opster.io/v1
+kind: OpenSearchCluster
+metadata:
+  name: opensearchcluster-name
+  namespace: default
+# ...
+spec:
+  security:
+    tls: # Everything related to TLS configuration
+      transport: # Configuration of the transport endpoint
+        generate: true  # Have the operator generate and sign certificates
+        perNode: true  # Separate certificate per node
+  confMgmt:
+    smartScaler: true
+  general:
+    version: 2.3.0
+    # additional configs for opensearch.yaml file
+    #additionalConfig:
+    #  some.config.option: {}
+    serviceName: opensearchcluster-servicename
+    #TODO: precisa instalar o plugin do prometheus?
+    pluginsList: [ "repository-s3" ]
+    setVMMaxMapCount: true
+    keystore:
+      # With this configuration all keys of the secrets will become keys in the keystore.
+      - secret:
+          name: s3-secret
+    snapshotRepositories:
+      - name: opensearchoperator_test_backup
+        type: s3
+        settings:
+          bucket: opensearchoperator-test-backup
+          region: us-east-1
+          base_path: os-snapshot
+    # Error: container's runAsUser breaks non-root policy
+    #podSecurityContext:
+    #  runAsNonRoot: true
+    securityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+  dashboards:
+    version: 2.3.0
+    enable: true
+    tls:
+      enable: true  # Configure TLS
+      generate: true  # Have the Operator generate and sign a certificate
+    podSecurityContext:
+      runAsNonRoot: true
+    securityContext:
+      capabilities:
+        drop:
+          - ALL
+      privileged: false
+    replicas: 1
+    additionalConfig:
+      #TODO: to check for what it can be uses
+      #opensearch_security.auth.type: "proxy"
+      opensearch_security.multitenancy.enabled: "true"
+      # Set the value of this setting to false to hide the help menu link to the OpenSearch Dashboards user survey
+      #opensearchDashboards:
+      #  survey:
+      #    url: "false"
+      #  branding:
+      #    logo:
+      #      defaultUrl: ""
+      #      darkModeUrl: ""
+      #    mark:
+      #      defaultUrl: ""
+      #      darkModeUrl: ""
+      #    loadingLogo:
+      #      defaultUrl: ""
+      #      darkModeUrl: ""
+      #    faviconUrl: ""
+      #    applicationTitle: ""
+      #    useExpandedHeader: false
+    service:
+      type: LoadBalancer
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "200m"
+  nodePools:
+    #TODO: configure OpenSearch nodes to use a PriorityClass using the name of the priority class. This is useful to prevent unwanted evictions of your OpenSearch nodes.
+    #priorityClassName: somePriorityClassName
+    - component: master
+      replicas: 3
+      # Recommendation: Set to half of memory request
+      jvm: -Xmx512M -Xms512M
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "500m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"
+      diskSize: "5Gi"
+      persistence:
+        pvc:
+          storageClass: openebs
+          accessModes:
+            - ReadWriteOnce
+      pdb:
+        enable: true
+        minAvailable: 3
+      roles:
+        - "cluster_manager"
+    - component: data
+      replicas: 2
+      # Recommendation: Set to half of memory request
+      jvm: -Xmx1024M -Xms1024M
+      resources:
+        requests:
+          memory: "2Gi"
+          cpu: "500m"
+        limits:
+          memory: "2Gi"
+          cpu: "500m"
+      diskSize: "5Gi"
+      persistence:
+        pvc:
+          storageClass: openebs
+          accessModes:
+            - ReadWriteOnce
+      pdb:
+        enable: true
+        maxUnavailable: 1
+      roles:
+        - "data"
+        - "ingest"
+    - component: coordinators
+      replicas: 1
+      jvm: -Xmx1024M -Xms1024M
+      resources:
+        requests:
+          memory: "2Gi"
+          cpu: "500m"
+        limits:
+          memory: "2Gi"
+          cpu: "500m"
+      diskSize: "5Gi"
+      persistence:
+        pvc:
+          storageClass: openebs
+          accessModes:
+            - ReadWriteOnce
+      roles: [ ]

@@ -1,0 +1,5 @@
+resources:
+  - ../../base/opensearch-cluster
+
+namespace: homelab-opensearch
+
