@@ -1,0 +1,6 @@
+resources:
+  - resources
+  - opensearchCluster-custom.yaml
+  - namespace.yaml
+  #TODO: to check how it will works with opensearch dashboard TLS enabled
+  #- ingress.yaml

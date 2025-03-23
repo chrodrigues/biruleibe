@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: opensearch-dashboards
+spec:
+  tls:
+    - hosts:
+        - dashboards.my.company
+  rules:
+    - host: dashboards.my.company
+      http:
+        paths:
+          - backend:
+              service:
+                name: my-cluster-dashboards
+                port:
+                  number: 5601
+            path: "/(.*)"
+            pathType: ImplementationSpecific
