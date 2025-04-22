@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opensearch-logging
+  namespace: homelab-opensearch
+data:
+  security-log4j2.properties: |
+    appender.console.type=Console
+    appender.console.name=console
+    appender.console.layout.type=PatternLayout
+    appender.console.layout.pattern=[%d{ISO8601}][%-5p][%-25c] %m%n
+    logger.security.level=debug
+    logger.security.name=org.opensearch.security
+    logger.security.additivity=false
+    logger.security.appenderRef.console.ref=console
