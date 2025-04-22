@@ -1,37 +1,46 @@
 apiVersion: opensearch.opster.io/v1
 kind: OpenSearchCluster
 metadata:
-  name: opensearchcluster-name
+  name: opensearch
   namespace: default
-# ...
 spec:
   security:
-    tls: # Everything related to TLS configuration
-      transport: # Configuration of the transport endpoint
-        generate: true  # Have the operator generate and sign certificates
-        perNode: true  # Separate certificate per node
+    tls:
+      transport:
+        generate: false
+        perNode: false
+        secret:
+          name: cluster-transport-cert
+        nodesDn:
+          - "CN=*.svc.cluster.local"
+        adminDn:
+          - "CN=opensearch-admin"
+      http: # Added this section
+        generate: false
+        secret:
+          name: cluster-transport-cert
+    config:
+      adminSecret:
+        name: cluster-admin-cert
   confMgmt:
     smartScaler: true
   general:
     version: 2.3.0
-    # additional configs for opensearch.yaml file
-    #additionalConfig:
-    #  some.config.option: {}
-    serviceName: opensearchcluster-servicename
-    #TODO: precisa instalar o plugin do prometheus?
-    pluginsList: [ "repository-s3" ]
+    serviceName: opensearch-service
     setVMMaxMapCount: true
-    keystore:
-      # With this configuration all keys of the secrets will become keys in the keystore.
-      - secret:
-          name: s3-secret
-    snapshotRepositories:
-      - name: opensearchoperator_test_backup
-        type: s3
-        settings:
-          bucket: opensearchoperator-test-backup
-          region: us-east-1
-          base_path: os-snapshot
+    #TODO: precisa instalar o plugin do prometheus?
+    #pluginsList: [ "repository-s3" ]
+    #keystore:
+    #  # With this configuration all keys of the secrets will become keys in the keystore.
+    #  - secret:
+    #      name: s3-secret
+    #snapshotRepositories:
+    #  - name: opensearchoperator_test_backup
+    #    type: s3
+    #    settings:
+    #      bucket: opensearchoperator-test-backup
+    #      region: us-east-1
+    #      base_path: os-snapshot
     # Error: container's runAsUser breaks non-root policy
     #podSecurityContext:
     #  runAsNonRoot: true
@@ -41,11 +50,9 @@ spec:
   dashboards:
     version: 2.3.0
     enable: true
-    tls:
-      enable: true  # Configure TLS
-      generate: true  # Have the Operator generate and sign a certificate
     podSecurityContext:
       runAsNonRoot: true
+      runAsUser: 1000
     securityContext:
       capabilities:
         drop:
@@ -77,25 +84,25 @@ spec:
       type: LoadBalancer
     resources:
       requests:
-        memory: "512Mi"
-        cpu: "200m"
+        memory: "2Gi"
+        cpu: "1000m"
       limits:
-        memory: "512Mi"
-        cpu: "200m"
+        memory: "2Gi"
+        cpu: "1000m"
   nodePools:
     #TODO: configure OpenSearch nodes to use a PriorityClass using the name of the priority class. This is useful to prevent unwanted evictions of your OpenSearch nodes.
     #priorityClassName: somePriorityClassName
     - component: master
       replicas: 3
       # Recommendation: Set to half of memory request
-      jvm: -Xmx512M -Xms512M
+      jvm: -Xmx2048M -Xms2048M
       resources:
         requests:
-          memory: "1Gi"
+          memory: "3Gi"
           cpu: "500m"
         limits:
-          memory: "1Gi"
-          cpu: "500m"
+          memory: "3Gi"
+          cpu: "1000m"
       diskSize: "5Gi"
       persistence:
         pvc:
@@ -114,10 +121,10 @@ spec:
       resources:
         requests:
           memory: "2Gi"
-          cpu: "500m"
+          cpu: "1000m"
         limits:
           memory: "2Gi"
-          cpu: "500m"
+          cpu: "1000m"
       diskSize: "5Gi"
       persistence:
         pvc:
@@ -126,24 +133,19 @@ spec:
             - ReadWriteOnce
       pdb:
         enable: true
-        maxUnavailable: 1
+        maxUnavailable: 0
       roles:
         - "data"
         - "ingest"
-    - component: coordinators
+    - component: client
       replicas: 1
-      jvm: -Xmx1024M -Xms1024M
+      jvm: -Xmx2048M -Xms2048M
       resources:
         requests:
-          memory: "2Gi"
-          cpu: "500m"
+          memory: "3Gi"
+          cpu: "1000m"
         limits:
-          memory: "2Gi"
-          cpu: "500m"
-      diskSize: "5Gi"
-      persistence:
-        pvc:
-          storageClass: openebs
-          accessModes:
-            - ReadWriteOnce
-      roles: [ ]
+          memory: "3Gi"
+          cpu: "1000m"
+      roles:
+        - "remote_cluster_client"
