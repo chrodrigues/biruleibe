@@ -10,11 +10,6 @@ resource "helm_release" "metrics_server" {
     value = var.prometheus_metrics_server_replicas
   }
 
-  #set {
-  #  name = "image.tag"
-  #  value = var.metrics_server_version
-  #}
-
 }
 
 resource "helm_release" "kube-prometheus" {

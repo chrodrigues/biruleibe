@@ -1,32 +1,32 @@
 variable "proxmox_endpoint" {
-  description = "proxmox server address"
+  description = "Proxmox server address"
   type = string
 }
 
 variable "proxmox_user_name" {
-  description = "proxmox api token id"
+  description = "Proxmox api token id"
   type = string
 }
 
 variable "proxmox_user_password" {
-  description = "proxmox api token secret"
+  description = "Proxmox api token secret"
   type = string
   sensitive = true
 }
 
 variable "proxmox_vm_user" {
-  description = "linux username"
+  description = "Linux username"
   type = string
 }
 
 variable "proxmox_vm_password" {
-  description = "linux user password"
+  description = "Linux user password"
   type = string
   sensitive = true
 }
 
 variable "proxmox_node_name" {
-  description = "proxmox server name"
+  description = "Proxmox server name"
   type = string
 }
 
@@ -43,27 +43,27 @@ variable "proxmox_vm_name_k8s_control_plane" {
 }
 
 variable "proxmox_number_of_vm_k8s_worker_node" {
-  description = "number of k8s nodes"
+  description = "Number of k8s worker nodes"
   type = string
 }
 
 variable "proxmox_number_of_vm_k8s_control_plane" {
-  description = "number of k8s nodes"
+  description = "Number of k8s control plane nodes"
   type = string
 }
 
 variable "k8s_control_plane_ip_start" {
-  description = "vm ip address"
+  description = "First IP of the k8s control plane address range"
   type = string
 }
 
 variable "k8s_worker_ip_start" {
-  description = "vm ip address"
+  description = "First IP of the k8s worker nodes address range"
   type = string
 }
 
 variable "proxmox_datastore_name" {
-  description = "virtual machines datastore"
+  description = "Promox datastore"
   type = string
   default = "local"
 }
