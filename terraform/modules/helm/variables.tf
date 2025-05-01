@@ -1,40 +1,35 @@
-#variable "metrics_server_version" {
-#    type = string
-#    description = "Versão do helm chart do metrics server"
-#}
-
 variable "prometheus_metrics_server_replicas" {
   type        = string
-  description = "Número de replicas do metrics server"
+  description = "Number of prometheus metrics server replicas"
 }
 
 variable "prometheus_retention" {
   type        = string
-  description = "Tempo de retenção das métricas"
+  description = "Retention in days for prometheus"
 }
 
 variable "prometheus_storageclass_name" {
   type        = string
-  description = "Tamanho do disco para o Prometheus"
+  description = "Storage class name"
 }
 
 variable "prometheus_disk_size" {
   type        = string
-  description = "Tamanho do disco para o Prometheus"
+  description = "Disk size for prometheus"
 }
 
 
 variable "grafana_password_admin" {
   type        = string
-  description = "Senha usuário admin grafana dashboards"
+  description = "Password for admin user"
 }
 
 variable "grafana_disk_size" {
   type        = string
-  description = "Tamanho do disco para o Grafana"
+  description = "Disk size for grafana"
 }
 
 variable "grafana_storageclass_name" {
   type        = string
-  description = "Tamanho do disco para o Grafana"
+  description = "Storage class name"
 }
