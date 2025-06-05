@@ -98,11 +98,11 @@ spec:
       jvm: -Xmx2048M -Xms2048M
       resources:
         requests:
-          memory: "3Gi"
-          cpu: "500m"
+          memory: "128Mi"
+          cpu: "100m"
         limits:
-          memory: "3Gi"
-          cpu: "1000m"
+          memory: "512Mi"
+          cpu: "500m"
       diskSize: "5Gi"
       persistence:
         pvc:
@@ -120,8 +120,8 @@ spec:
       jvm: -Xmx1024M -Xms1024M
       resources:
         requests:
-          memory: "2Gi"
-          cpu: "1000m"
+          memory: "512Mi"
+          cpu: "100m"
         limits:
           memory: "2Gi"
           cpu: "1000m"
@@ -142,8 +142,8 @@ spec:
       jvm: -Xmx2048M -Xms2048M
       resources:
         requests:
-          memory: "3Gi"
-          cpu: "1000m"
+          memory: "512Mi"
+          cpu: "100m"
         limits:
           memory: "3Gi"
           cpu: "1000m"
