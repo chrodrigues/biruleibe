@@ -147,5 +147,14 @@ spec:
         limits:
           memory: "3Gi"
           cpu: "1000m"
+      diskSize: "5Gi"
+      persistence:
+        pvc:
+          storageClass: openebs
+          accessModes:
+            - ReadWriteOnce
+      pdb:
+        enable: true
+        maxUnavailable: 0
       roles:
         - "remote_cluster_client"
