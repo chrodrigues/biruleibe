@@ -21,7 +21,12 @@ spec:
   nodePools:
     - component: nodes
       replicas: 3
-      diskSize: "5Gi"
+      diskSize: "50Gi"
+      persistence:
+        pvc:
+          storageClass: openebs
+          accessModes:
+            - ReadWriteOnce
       nodeSelector:
       resources:
         requests:
