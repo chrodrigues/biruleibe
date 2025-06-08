@@ -25,7 +25,7 @@ spec:
             - name: nginx-repo
               mountPath: /mnt/repo
       containers:
-        - image: nginx
+        - image: ghcr.io/chrodrigues/thingslikethat/nginx:1.0.0
           name: nginx
           resources: {}
           livenessProbe:
