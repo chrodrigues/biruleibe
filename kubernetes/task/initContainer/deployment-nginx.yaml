@@ -17,13 +17,14 @@ spec:
       volumes:
         - name: nginx-repo
           emptyDir: {}
-      initContainers:
-        - name: git-clone
-          image: alpine/git
-          command: [ 'sh', '-c', 'git clone https://github.com/chrodrigues/nginx-html.git /mnt/repo' ]
-          volumeMounts:
-            - name: nginx-repo
-              mountPath: /mnt/repo
+      # the source repository has been deleted.
+      #initContainers:
+      #  - name: git-clone
+      #    image: alpine/git
+      #    command: [ 'sh', '-c', 'git clone https://github.com/chrodrigues/nginx-html.git /mnt/repo' ]
+      #    volumeMounts:
+      #      - name: nginx-repo
+      #        mountPath: /mnt/repo
       containers:
         - image: ghcr.io/chrodrigues/thingslikethat/nginx:1.0.0
           name: nginx
