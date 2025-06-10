@@ -1,0 +1,17 @@
+# Build the image with both tags
+docker build -t ghcr.io/chrodrigues/thingslikethat/nginx:latest -t ghcr.io/chrodrigues/thingslikethat/nginx:2.0.0 .
+
+# Log in to GitHub Container Registry
+echo your password | docker login ghcr.io -u chrodrigues --password-stdin
+
+# Push both tagged images
+docker push ghcr.io/chrodrigues/thingslikethat/nginx:latest
+docker push ghcr.io/chrodrigues/thingslikethat/nginx:2.0.0
+
+# Create pull secret
+
+kubectl create secret docker-registry github-pull-secret \
+  --namespace=argocd \
+  --docker-server=ghcr.io \
+  --docker-username=chrodrigues \
+  --docker-password=your password
